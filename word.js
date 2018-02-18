@@ -1,23 +1,19 @@
 var Letter = require('./letter.js');
 
 function Word(word) {
-    // store the string word
     this.word = word;
-    // collection of letter objects
     this.letters = [];
     this.wordFound = false;
 }
 
-Word.prototype.getLets = function () {
-    // populate the collection above with new Letter objects
+Word.prototype.getLetters = function () {
     for (var i = 0; i < this.word.length; i++) {
         var newLetter = new Letter(this.word[i]);
         this.letters.push(newLetter);
     }
 };
 
-// found the current word
-Word.prototype.didWeFindTheWord = function () {
+Word.prototype.wordComplete = function () {
     if (this.letters.every(function (lttr) {
         return lttr.appear === true;
     })) {
@@ -27,23 +23,20 @@ Word.prototype.didWeFindTheWord = function () {
 };
 
 Word.prototype.checkIfLetterFound = function (guessedLetter) {
-    var whatToReturn = 0;
-    // iterates through each letter to see if it matches the guessed letter
+    var showLetter = 0;
     this.letters.forEach(function (lttr) {
         if (lttr.letter === guessedLetter) {
             lttr.appear = true;
-            whatToReturn++;
+            showLetter++;
         }
     })
-    // if guessLetter matches Letter property, the letter object should be shown
-    return whatToReturn;
+    return showLetter;
 };
 
-Word.prototype.wordRender = function () {
+Word.prototype.showWord = function () {
     var display = '';
-    // render the word based on if letters are found or not
     this.letters.forEach(function (lttr) {
-        var currentLetter = lttr.letterRender();
+        var currentLetter = lttr.letterOrSpace();
         display += currentLetter;
     });
     return display;

@@ -1,55 +1,34 @@
-// require inquirer
 var inquirer = require('inquirer');
-// requre is-letter
 var isLetter = require('is-letter');
-// require objects/exports
 var Word = require('./word.js');
-var listOfWords = ["WORDS", "HELLO WORLD", "ANOTHER ANSWER"];
-var wordBank = listOfWords;
+var listOfWords = ["BANANA", "APPLE", "MANGO", "ORANGE", "STARFRUIT", "WATERMELON", "KIWI", "CHERRY", "RASPBERRY", "BLUEBERRY"];
 var guessesRemaining = 10;
-// empty array to hold letters guessed by user. And checks if the user guessed the letter already
 var guessedLetters = [];
 var currentWord = null;
-// asks user if they are ready to play
+
 function startGame() {
-
-    // clears guessedLetters before a new game starts if it's not already empty.
-    if (guessedLetters.length > 0) {
-        guessedLetters = [];
-    }
-
     inquirer.prompt([{
         name: "play",
         type: "confirm",
-        message: "Ready to play?"
-    }]).then(function (answer) {
-        if (answer.play) {
+        message: "Do you want to guess a word?"
+    }]).then(function (user) {
+        if (user.play) {
             newGame();
         } else {
-            console.log("Fine, I didn't want to play anyway..");
+            console.log("No worries. Come back when you're ready.");
         }
     })
 };
-//if they want to play starts new game.
+
 function newGame() {
-    if (guessesRemaining === 10) {
-        console.log("Okay! Here we go!");
-        console.log('*****************');
-        //generates random number based on the wordBank
-        var randNum = Math.floor(Math.random() * wordBank.length);
-        currentWord = new Word(wordBank[randNum]);
-        currentWord.getLets();
-        //displays current word as blanks.
-        console.log(currentWord.wordRender());
-        keepPromptingUser();
-    } else {
-        resetGuessesRemaining();
-        newGame();
-    }
+    console.log("See if you can guess this word!");
+    var randNum = Math.floor(Math.random() * listOfWords.length);
+    currentWord = new Word(listOfWords[randNum]);
+    currentWord.getLetters();
+    console.log(currentWord.showWord());
+    keepPromptingUser();
 };
-function resetGuessesRemaining() {
-    this.guessesRemaining = 10;
-};
+
 function keepPromptingUser() {
     //asks player for a letter
     inquirer.prompt([{
@@ -84,21 +63,21 @@ function keepPromptingUser() {
                 guessesRemaining--;
                 console.log('Guesses remaining: ' + guessesRemaining);
                 console.log('\n*******************');
-                console.log(currentWord.wordRender());
+                console.log(currentWord.showWord());
                 console.log('\n*******************');
 
                 console.log("Letters guessed: " + guessedLetters);
             } else {
                 console.log('Yes! You guessed right!');
                 //checks to see if user won
-                if (currentWord.didWeFindTheWord() === true) {
-                    console.log(currentWord.wordRender());
+                if (currentWord.wordComplete() === true) {
+                    console.log(currentWord.showWord());
                     console.log('Congratulations! You won the game!!!');
                     // that.startGame();
                 } else {
                     // display the user how many guesses remaining
                     console.log('Guesses remaining: ' + guessesRemaining);
-                    console.log(currentWord.wordRender());
+                    console.log(currentWord.showWord());
                     console.log('\n*******************');
                     console.log("Letters guessed: " + guessedLetters);
                 }
