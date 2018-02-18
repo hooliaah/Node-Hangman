@@ -1,5 +1,4 @@
 var inquirer = require('inquirer');
-var isLetter = require('is-letter');
 var Word = require('./word.js');
 var listOfWords = ["BANANA", "APPLE", "MANGO", "ORANGE", "STARFRUIT", "WATERMELON", "KIWI", "CHERRY", "RASPBERRY", "BLUEBERRY"];
 var guessesRemaining = 10;
@@ -21,61 +20,54 @@ function startGame() {
 };
 
 function newGame() {
-    console.log("See if you can guess this word!");
+    guessesRemaining = 10;
+    guessedLetters = [];
     var randNum = Math.floor(Math.random() * listOfWords.length);
     currentWord = new Word(listOfWords[randNum]);
     currentWord.getLetters();
+    console.log("See if you can guess this word!");
     console.log(currentWord.showWord());
     keepPromptingUser();
 };
 
 function keepPromptingUser() {
-    //asks player for a letter
     inquirer.prompt([{
         name: "chosenLetter",
         type: "input",
-        message: "Choose a letter:",
+        message: "Pick a letter: ",
         validate: function (value) {
-            if (isLetter(value)) {
+            if (value.match(/[a-zA-Z]/)) {
                 return true;
             } else {
                 return false;
             }
         }
     }]).then(function (letter) {
-        //toUpperCase because words in word bank are all caps
-        var letterReturned = (letter.chosenLetter).toUpperCase();
-        //adds to the guessedLetters array if it isn't already there
+        var letterGuessed = (letter.chosenLetter).toUpperCase();
         var guessedAlready = false;
         for (var i = 0; i < guessedLetters.length; i++) {
-            if (letterReturned === guessedLetters[i]) {
+            if (letterGuessed === guessedLetters[i]) {
                 guessedAlready = true;
             }
         }
-        //if the letter wasn't guessed already run through entire function, else reprompt user
         if (guessedAlready === false) {
-            guessedLetters.push(letterReturned);
-
-            var found = currentWord.checkIfLetterFound(letterReturned);
-            //if none were found tell user they were wrong
+            guessedLetters.push(letterGuessed);
+            var found = currentWord.checkIfLetterFound(letterGuessed);
             if (found === 0) {
-                console.log('Nope! You guessed wrong.');
                 guessesRemaining--;
+                console.log('Wrong guess. Try again!');
                 console.log('Guesses remaining: ' + guessesRemaining);
-                console.log('\n*******************');
+                console.log('*******************');
                 console.log(currentWord.showWord());
                 console.log('\n*******************');
-
                 console.log("Letters guessed: " + guessedLetters);
             } else {
-                console.log('Yes! You guessed right!');
-                //checks to see if user won
+                console.log('Yay! Nice guess.');
                 if (currentWord.wordComplete() === true) {
                     console.log(currentWord.showWord());
                     console.log('Congratulations! You won the game!!!');
-                    // that.startGame();
+                    startGame();
                 } else {
-                    // display the user how many guesses remaining
                     console.log('Guesses remaining: ' + guessesRemaining);
                     console.log(currentWord.showWord());
                     console.log('\n*******************');
@@ -86,10 +78,11 @@ function keepPromptingUser() {
                 keepPromptingUser();
             } else if (guessesRemaining === 0) {
                 console.log('Game over!');
-                console.log('The word you were guessing was: ' + currentWord.word);
+                console.log('The word was: ' + currentWord.word);
+                startGame();
             }
         } else {
-            console.log("You've guessed that letter already. Try again.")
+            console.log("That letter was already guessed. Try again.")
             keepPromptingUser();
         }
     });
